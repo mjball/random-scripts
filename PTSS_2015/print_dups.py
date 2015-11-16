@@ -3,7 +3,9 @@
 import argparse
 import os, os.path
 import PIL, PIL.Image, PIL.ExifTags
-from datetime import datetime
+from datetime import datetime, timedelta
+
+THRESHOLD = timedelta(seconds=4)
 
 __all__ = ('main',)
 
@@ -11,10 +13,7 @@ def main():
     args = parse_args()
     the_dir = args.directory
     sorted_image_info = gather_sorted_image_info(the_dir)
-    print sorted_image_info
-
-#last_filepath = None
-#last_timestamp = None
+    print_potential_duplicates(sorted_image_info)
 
 def gather_sorted_image_info(the_dir):
     file_info = []
@@ -24,7 +23,7 @@ def gather_sorted_image_info(the_dir):
             filepath = os.path.join(the_dir, filename)
             timestamp = extract_exif_timestamp(filepath)
             file_info.append({
-                'image_path': filepath,
+                'filepath': filepath,
                 'timestamp': timestamp
             })
 
@@ -47,32 +46,21 @@ def extract_exif_timestamp(the_path):
     exif_ts = exif['DateTimeOriginal']
     return datetime.strptime(exif_ts, '%Y:%m:%d %H:%M:%S')
 
-#########
+def print_potential_duplicates(images):
+    last_filepath = None
+    last_timestamp = None
 
-# for filename in sorted(os.listdir(my_dir)):
-#     filepath = os.path.join(my_dir, filename)
-#     if not filepath.endswith('.JPG'):
-#         continue
+    for image in images:
+        timestamp = image['timestamp']
+        filepath = image['filepath']
 
-#     print filename
-    
-#     img = PIL.Image.open(filepath)
-#     exif = {
-#         PIL.ExifTags.TAGS[k]: v
-#         for k, v in img._getexif().items()
-#         if k in PIL.ExifTags.TAGS
-#     }
+        if last_timestamp:
+            delta = timestamp - last_timestamp
+            if delta <= THRESHOLD:
+                print '{0} - {1} = {2}'.format(last_timestamp, timestamp, delta.seconds)
 
-#     # 2015:11:13 14:46:03
-#     exif_ts = exif['DateTimeOriginal']
-#     timestamp = datetime.strptime(exif_ts, '%Y:%m:%d %H:%M:%S')
-
-#     if last_timestamp:
-#         delta = timestamp - last_timestamp
-#         print '{0} - {1} = {2}'.format(last_timestamp, timestamp, delta.seconds)
-
-#     last_filepath = filepath
-#     last_timestamp = timestamp
+        last_filepath = filepath
+        last_timestamp = timestamp
 
 def parse_args():
     parser = argparse.ArgumentParser()
