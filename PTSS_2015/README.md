@@ -1,0 +1,1 @@
+I set up a camera for time lapse to capture PTSS this year, but for a while had the shutter set to "continus shooting" rather than "single shooting," so there are a bunch of almost-duplicate photos. Rather than manually sorting through the photos, this script identifies duplicates by the EXIF timestamp.
