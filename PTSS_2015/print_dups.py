@@ -57,7 +57,8 @@ def print_potential_duplicates(images):
         if last_timestamp:
             delta = timestamp - last_timestamp
             if delta <= THRESHOLD:
-                print '{0} - {1} = {2}'.format(last_timestamp, timestamp, delta.seconds)
+                print filepath
+                #print '{0} - {1} = {2}'.format(last_timestamp, timestamp, delta.seconds)
 
         last_filepath = filepath
         last_timestamp = timestamp
